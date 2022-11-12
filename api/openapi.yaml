@@ -1,0 +1,76 @@
+openapi: 3.0.2
+info:
+  title: Booksehlf
+  version: 1.0.0
+  description: API for Bookshelf application
+  contact:
+    name: Cleyson Lima
+    email: cleysonph@gmail.com
+servers:
+  - url: http://localhost:8000
+    description: Local server
+tags:
+  - name: Books
+    description: Books management
+paths:
+  /api/v1/books:
+    get:
+      tags:
+        - Books
+      summary: Get all books
+      description: Get all books
+      operationId: getBooks
+      parameters:
+        - name: q
+          in: query
+          description: Search query
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/BookSummaryResponse"
+components:
+  schemas:
+    BookSummaryResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        title:
+          type: string
+          example: The Lord of the Rings
+        isbn:
+          type: string
+          example: "9783161484100"
+        authors:
+          type: array
+          items:
+            type: string
+          example:
+            - J. R. R. Tolkien
+        categories:
+          type: array
+          items:
+            type: string
+          example:
+            - Fiction
+            - Fantasy
+        language:
+          type: string
+          enum:
+            - en
+            - pt
+          example: en
+        cover:
+          type: string
+          format: uri
+          example: https://covers.openlibrary.org/b/id/7984916-M.jpg
