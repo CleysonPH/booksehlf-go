@@ -74,7 +74,7 @@ func (b Book) validate() error {
 	}
 
 	if len(b.isbn) != 13 {
-		return errors.New("isbn must be 13 characters")
+		return errors.New("isbn must be 13 digits")
 	}
 
 	for _, c := range b.isbn {
@@ -84,11 +84,11 @@ func (b Book) validate() error {
 	}
 
 	if len(b.authors) == 0 {
-		return errors.New("authors is required")
+		return errors.New("authors are required")
 	}
 
 	if len(b.categories) == 0 {
-		return errors.New("categories is required")
+		return errors.New("categories are required")
 	}
 
 	if b.language == "" {
