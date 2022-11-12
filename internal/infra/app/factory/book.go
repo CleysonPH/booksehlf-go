@@ -11,7 +11,7 @@ var bookGateway gateway.BookGateway
 
 func BookGateway() gateway.BookGateway {
 	if bookGateway == nil {
-		bookGateway = gatewayImpl.NewBookInMemoryGateway()
+		bookGateway = gatewayImpl.NewBookMySQLGateway(gatewayImpl.DB())
 	}
 	return bookGateway
 }

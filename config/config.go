@@ -8,9 +8,11 @@ import (
 )
 
 var (
-	port string
-	env  string
-	host string
+	port     string
+	env      string
+	host     string
+	dsn      string
+	dbdriver string
 )
 
 func Init(enviroment string) {
@@ -22,10 +24,20 @@ func Init(enviroment string) {
 	}
 	port = os.Getenv("PORT")
 	host = os.Getenv("HOST")
+	dsn = os.Getenv("DSN")
+	dbdriver = os.Getenv("DBDRIVER")
 }
 
 func Addr() string {
 	return host + ":" + port
+}
+
+func DSN() string {
+	return dsn
+}
+
+func DBDriver() string {
+	return dbdriver
 }
 
 func IsDev() bool {
