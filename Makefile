@@ -1,4 +1,5 @@
 env=dev
+dsn="mysql://root:root@tcp(localhost:3306)/bookshelf"
 
 .PHONY: test
 test:
@@ -26,4 +27,22 @@ clean:
 run:
 	@echo "Running..."
 	@go run cmd/app/app.go --env=$(env)
+	@echo "Done."
+
+.PHONY: makemigration
+makemigration:
+	@echo "Creating migration..."
+	@migrate create -ext sql -dir migrations -seq $(name)
+	@echo "Done."
+
+.PHONY: migrateup
+migrateup:
+	@echo "Migrating up..."
+	@migrate -path migrations -database $(dsn) -verbose up
+	@echo "Done."
+
+.PHONY: migratedown
+migratedown:
+	@echo "Migrating down..."
+	@migrate -path migrations -database $(dsn) -verbose down
 	@echo "Done."

@@ -8,6 +8,7 @@ import (
 
 	"github.com/cleysonph/bookshelf-go/config"
 	"github.com/cleysonph/bookshelf-go/internal/infra/app/rest"
+	"github.com/cleysonph/bookshelf-go/internal/infra/gateway"
 )
 
 func Run() {
@@ -16,6 +17,7 @@ func Run() {
 	flag.Parse()
 
 	config.Init(env)
+	gateway.InitDB(config.DSN(), config.DBDriver())
 
 	srv := http.Server{
 		Addr:         config.Addr(),
