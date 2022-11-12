@@ -36,6 +36,39 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/BookSummaryResponse"
+  /api/v1/books/{bookId}:
+    get:
+      tags:
+        - Books
+      summary: Get book by id
+      description: Get book by id
+      operationId: getBookById
+      parameters:
+        - name: bookId
+          in: path
+          description: Book id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BookResponse"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                message: Book not found
+                timestamp: 2020-01-01T00:00:00.000Z
+                status: 404
+                error: Not Found
+                cause: BookNotFoundError
 components:
   schemas:
     BookSummaryResponse:
@@ -74,3 +107,80 @@ components:
           type: string
           format: uri
           example: https://covers.openlibrary.org/b/id/7984916-M.jpg
+    BookResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        title:
+          type: string
+          example: The Lord of the Rings
+        isbn:
+          type: string
+          example: "9783161484100"
+        authors:
+          type: array
+          items:
+            type: string
+          example:
+            - J. R. R. Tolkien
+        categories:
+          type: array
+          items:
+            type: string
+          example:
+            - Fiction
+            - Fantasy
+        language:
+          type: string
+          enum:
+            - en
+            - pt
+          example: en
+        cover:
+          type: string
+          format: uri
+          example: https://covers.openlibrary.org/b/id/7984916-M.jpg
+        description:
+          type: string
+          example: The Lord of the Rings is an epic high fantasy novel written by English author and scholar J. R. R. Tolkien. The story began as a sequel to Tolkien's 1937 fantasy novel The Hobbit, but eventually developed into a much larger work. Written in stages between 1937 and 1949, The Lord of the Rings is one of the best-selling novels ever written, with over 150 million copies sold.
+        publishedDate:
+          type: string
+          format: date
+          example: 1954-07-29
+        publisher:
+          type: string
+          example: George Allen & Unwin
+        pages:
+          type: integer
+          format: int32
+          example: 1216
+        edition:
+          type: integer
+          format: int32
+          example: 1
+        created_at:
+          type: string
+          format: date-time
+          example: 2020-01-01T00:00:00.000Z
+        updated_at:
+          type: string
+          format: date-time
+          example: 2020-01-01T00:00:00.000Z
+    ErrorResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+        status:
+          type: integer
+          format: int32
+        error:
+          type: string
+        cause:
+          type: string
