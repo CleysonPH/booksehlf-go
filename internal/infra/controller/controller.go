@@ -27,6 +27,9 @@ func newJsonResponse(statusCode int, body interface{}) *web.HttpResponse {
 
 func handleErrorResponse(err error) *web.HttpResponse {
 	switch t := err.(type) {
+	case *application.BookNotFoundError:
+		e := dto.NewErrorResponse(t, http.StatusNotFound)
+		return newJsonResponse(e.Status, e)
 	case *application.ApplicationError:
 		e := dto.NewErrorResponse(t, http.StatusInternalServerError)
 		return newJsonResponse(e.Status, e)
