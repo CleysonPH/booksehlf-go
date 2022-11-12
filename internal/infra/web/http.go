@@ -22,10 +22,12 @@ func NewHttpResponse(statusCode int, body []byte, headers Headers) *HttpResponse
 
 type HttpRequest struct {
 	QueryParams url.Values
+	URLParams   map[string]string
 }
 
-func NewHttpRequest(queryParams url.Values) *HttpRequest {
+func NewHttpRequest(queryParams url.Values, urlParams map[string]string) *HttpRequest {
 	return &HttpRequest{
 		QueryParams: queryParams,
+		URLParams:   urlParams,
 	}
 }
