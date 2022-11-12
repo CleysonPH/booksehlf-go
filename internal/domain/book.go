@@ -1,15 +1,25 @@
 package domain
 
-import "errors"
+import (
+	"errors"
+	"time"
+)
 
 type Book struct {
-	id         int64
-	title      string
-	isbn       string
-	authors    []string
-	categories []string
-	language   string
-	cover      string
+	id          int64
+	title       string
+	isbn        string
+	authors     []string
+	categories  []string
+	language    string
+	cover       string
+	description string
+	publishedAt time.Time
+	publisher   string
+	pages       int32
+	edition     int32
+	createdAt   time.Time
+	updatedAt   time.Time
 }
 
 func NewBook(
@@ -29,6 +39,44 @@ func NewBook(
 		categories: categories,
 		language:   language,
 		cover:      cover,
+	}
+	if err := b.validate(); err != nil {
+		return nil, err
+	}
+	return b, nil
+}
+
+func NewBookWithAllValues(
+	id int64,
+	title string,
+	isbn string,
+	authors []string,
+	categories []string,
+	language string,
+	cover string,
+	description string,
+	publishedAt time.Time,
+	publisher string,
+	pages int32,
+	edition int32,
+	createdAt time.Time,
+	updatedAt time.Time,
+) (*Book, error) {
+	b := &Book{
+		id:          id,
+		title:       title,
+		isbn:        isbn,
+		authors:     authors,
+		categories:  categories,
+		language:    language,
+		cover:       cover,
+		description: description,
+		publishedAt: publishedAt,
+		publisher:   publisher,
+		pages:       pages,
+		edition:     edition,
+		createdAt:   createdAt,
+		updatedAt:   updatedAt,
 	}
 	if err := b.validate(); err != nil {
 		return nil, err
@@ -62,6 +110,34 @@ func (b Book) Language() string {
 
 func (b Book) Cover() string {
 	return b.cover
+}
+
+func (b Book) Description() string {
+	return b.description
+}
+
+func (b Book) PublishedAt() time.Time {
+	return b.publishedAt
+}
+
+func (b Book) Publisher() string {
+	return b.publisher
+}
+
+func (b Book) Pages() int32 {
+	return b.pages
+}
+
+func (b Book) Edition() int32 {
+	return b.edition
+}
+
+func (b Book) CreatedAt() time.Time {
+	return b.createdAt
+}
+
+func (b Book) UpdatedAt() time.Time {
+	return b.updatedAt
 }
 
 func (b Book) validate() error {
