@@ -2,6 +2,7 @@ package gateway
 
 import (
 	"errors"
+	"fmt"
 	"strings"
 
 	"github.com/cleysonph/bookshelf-go/internal/application"
@@ -12,9 +13,9 @@ import (
 type BookInMemoryGateway struct{}
 
 // FindById implements gateway.BookGateway
-func (*BookInMemoryGateway) FindById(id int64) (*domain.Book, error) {
+func (*BookInMemoryGateway) FindById(id string) (*domain.Book, error) {
 	for _, book := range books {
-		if book.ID() == id {
+		if fmt.Sprintf("%d", book.ID()) == id {
 			return book, nil
 		}
 	}

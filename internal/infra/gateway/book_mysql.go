@@ -17,12 +17,12 @@ type bookTable struct {
 	Authors     string
 	Categories  string
 	Language    string
-	Cover       string
-	Description string
-	PublishedAt time.Time
-	Publisher   string
-	Pages       int32
-	Edition     int32
+	Cover       sql.NullString
+	Description sql.NullString
+	PublishedAt sql.NullTime
+	Publisher   sql.NullString
+	Pages       sql.NullInt32
+	Edition     sql.NullInt32
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
 }
@@ -55,7 +55,7 @@ LIMIT 1
 `
 
 // FindById implements gateway.BookGateway
-func (*BookMySQLGateway) FindById(id int64) (*domain.Book, error) {
+func (*BookMySQLGateway) FindById(id string) (*domain.Book, error) {
 	row := db.QueryRow(findByIdQuery, id)
 	var f bookTable
 	if err := row.Scan(
@@ -83,12 +83,12 @@ func (*BookMySQLGateway) FindById(id int64) (*domain.Book, error) {
 		strings.Split(f.Authors, ","),
 		strings.Split(f.Categories, ","),
 		f.Language,
-		f.Cover,
-		f.Description,
-		f.PublishedAt,
-		f.Publisher,
-		f.Pages,
-		f.Edition,
+		f.Cover.String,
+		f.Description.String,
+		f.PublishedAt.Time,
+		f.Publisher.String,
+		f.Pages.Int32,
+		f.Edition.Int32,
 		f.CreatedAt,
 		f.UpdatedAt,
 	)
@@ -145,7 +145,7 @@ func (*BookMySQLGateway) FindAllByTitle(title string) ([]*domain.Book, error) {
 			strings.Split(f.Authors, ","),
 			strings.Split(f.Categories, ","),
 			f.Language,
-			f.Cover,
+			f.Cover.String,
 		)
 		if err != nil {
 			return nil, application.NewApplicationError(err, "error creating book")
