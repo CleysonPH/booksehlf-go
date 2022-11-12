@@ -9,6 +9,7 @@ test:
 .PHONY: coverage
 coverage:
 	@echo "Running tests..."
+	@mkdir -p coverage
 	@go test -coverprofile=coverage/coverage.out ./...
 	@echo "Done."
 	@echo "Generating coverage report..."
