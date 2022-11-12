@@ -14,7 +14,7 @@ type bookGatewayMock struct {
 }
 
 // FindById implements gateway.BookGateway
-func (b *bookGatewayMock) FindById(id int64) (*domain.Book, error) {
+func (b *bookGatewayMock) FindById(id string) (*domain.Book, error) {
 	args := b.Called(id)
 	return args.Get(0).(*domain.Book), args.Error(1)
 }

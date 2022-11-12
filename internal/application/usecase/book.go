@@ -25,6 +25,6 @@ func NewGetBookUseCase(bookGateway gateway.BookGateway) *GetBookUseCase {
 	return &GetBookUseCase{bookGateway}
 }
 
-func (u *GetBookUseCase) Execute(id int64) (*domain.Book, error) {
+func (u *GetBookUseCase) Execute(id string) (*domain.Book, error) {
 	return u.bookGateway.FindById(id)
 }
