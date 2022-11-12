@@ -20,6 +20,14 @@ func GetBooksUseCase() *usecase.GetBooksUseCase {
 	return usecase.NewGetBooksUseCase(BookGateway())
 }
 
+func GetBookUseCase() *usecase.GetBookUseCase {
+	return usecase.NewGetBookUseCase(BookGateway())
+}
+
 func GetBooksWebController() controller.WebController {
 	return controller.NewGetBooksWebController(GetBooksUseCase())
+}
+
+func GetBookWebController() controller.WebController {
+	return controller.NewGetBookWebController(GetBookUseCase())
 }

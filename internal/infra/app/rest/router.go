@@ -13,6 +13,8 @@ func NewRouter() http.Handler {
 
 	router.HandleFunc("/api/v1/books", adapter.MuxAdapt(factory.GetBooksWebController())).
 		Methods(http.MethodGet)
+	router.HandleFunc("/api/v1/books/{bookId}", adapter.MuxAdapt(factory.GetBookWebController())).
+		Methods(http.MethodGet)
 
 	return router
 }

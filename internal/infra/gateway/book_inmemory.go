@@ -1,13 +1,26 @@
 package gateway
 
 import (
+	"errors"
+	"fmt"
 	"strings"
 
+	"github.com/cleysonph/bookshelf-go/internal/application"
 	"github.com/cleysonph/bookshelf-go/internal/application/gateway"
 	"github.com/cleysonph/bookshelf-go/internal/domain"
 )
 
 type BookInMemoryGateway struct{}
+
+// FindById implements gateway.BookGateway
+func (*BookInMemoryGateway) FindById(id string) (*domain.Book, error) {
+	for _, book := range books {
+		if fmt.Sprintf("%d", book.ID()) == id {
+			return book, nil
+		}
+	}
+	return nil, application.NewBookNotFoundError(errors.New("book not found"), "Book not found")
+}
 
 func initialBooks() []*domain.Book {
 	books := make([]*domain.Book, 1)
