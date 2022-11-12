@@ -18,6 +18,12 @@ type bookGatewayMock struct {
 	mock.Mock
 }
 
+// FindById implements gateway.BookGateway
+func (b *bookGatewayMock) FindById(id int64) (*domain.Book, error) {
+	args := b.Called(id)
+	return args.Get(0).(*domain.Book), args.Error(1)
+}
+
 func (m *bookGatewayMock) FindAllByTitle(title string) ([]*domain.Book, error) {
 	args := m.Called(title)
 	return args.Get(0).([]*domain.Book), args.Error(1)
