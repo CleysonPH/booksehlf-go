@@ -18,7 +18,7 @@ func Run() {
 	config.Init(env)
 
 	srv := http.Server{
-		Addr:         ":8000",
+		Addr:         config.Addr(),
 		Handler:      rest.NewRouter(),
 		ReadTimeout:  10 * time.Second,
 		WriteTimeout: 10 * time.Second,
