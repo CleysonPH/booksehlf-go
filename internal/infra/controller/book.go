@@ -51,3 +51,21 @@ func (g *GetBookWebController) Execute(request *web.HttpRequest) *web.HttpRespon
 func NewGetBookWebController(getBookUseCase *usecase.GetBookUseCase) WebController {
 	return &GetBookWebController{getBookUseCase: getBookUseCase}
 }
+
+type DeleteBookWebController struct {
+	deleteBookUseCase *usecase.DeleteBookUseCase
+}
+
+// Execute implements WebController
+func (d *DeleteBookWebController) Execute(request *web.HttpRequest) *web.HttpResponse {
+	id := request.URLParams["bookId"]
+	err := d.deleteBookUseCase.Execute(id)
+	if err != nil {
+		return handleErrorResponse(err)
+	}
+	return newJsonResponse(http.StatusNoContent, nil)
+}
+
+func NewDeleteBookWebController(deleteBookUseCase *usecase.DeleteBookUseCase) WebController {
+	return &DeleteBookWebController{deleteBookUseCase: deleteBookUseCase}
+}
