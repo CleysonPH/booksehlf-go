@@ -18,6 +18,12 @@ type bookGatewayMock struct {
 	mock.Mock
 }
 
+// DeleteById implements gateway.BookGateway
+func (b *bookGatewayMock) DeleteById(id string) error {
+	args := b.Called(id)
+	return args.Error(0)
+}
+
 // FindById implements gateway.BookGateway
 func (b *bookGatewayMock) FindById(id string) (*domain.Book, error) {
 	args := b.Called(id)
