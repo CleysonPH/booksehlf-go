@@ -28,3 +28,15 @@ func NewGetBookUseCase(bookGateway gateway.BookGateway) *GetBookUseCase {
 func (u *GetBookUseCase) Execute(id string) (*domain.Book, error) {
 	return u.bookGateway.FindById(id)
 }
+
+type DeleteBookUseCase struct {
+	bookGateway gateway.BookGateway
+}
+
+func NewDeleteBookUseCase(bookGateway gateway.BookGateway) *DeleteBookUseCase {
+	return &DeleteBookUseCase{bookGateway}
+}
+
+func (u *DeleteBookUseCase) Execute(id string) error {
+	return u.bookGateway.DeleteById(id)
+}
