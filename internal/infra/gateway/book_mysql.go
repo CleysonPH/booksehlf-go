@@ -60,9 +60,6 @@ WHERE
 // DeleteById implements gateway.BookGateway
 func (*BookMySQLGateway) DeleteById(id string) error {
 	if _, err := db.Exec(deleteByIdQuery, id); err != nil {
-		if err == sql.ErrNoRows {
-			return application.NewBookNotFoundError(err, "book not found")
-		}
 		return application.NewApplicationError(err, "error deleting book")
 	}
 	return nil
