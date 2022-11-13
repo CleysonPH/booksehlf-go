@@ -10,7 +10,36 @@ import (
 	"github.com/cleysonph/bookshelf-go/internal/domain"
 )
 
+func initialBooks() []*domain.Book {
+	books := make([]*domain.Book, 1)
+	books[0], _ = domain.NewBook(1, "Title", "9783161484100", []string{"Author"}, []string{"Category"}, "en", "http://example.com/cover.jpg")
+	return books
+}
+
+var books = initialBooks()
+
 type BookInMemoryGateway struct{}
+
+// ExistsById implements gateway.BookGateway
+func (*BookInMemoryGateway) ExistsById(id string) bool {
+	for _, book := range books {
+		if fmt.Sprintf("%d", book.ID()) == id {
+			return true
+		}
+	}
+	return false
+}
+
+// DeleteById implements gateway.BookGateway
+func (*BookInMemoryGateway) DeleteById(id string) error {
+	for i, book := range books {
+		if fmt.Sprintf("%d", book.ID()) == id {
+			books = append(books[:i], books[i+1:]...)
+			return nil
+		}
+	}
+	return application.NewBookNotFoundError(errors.New("book not found"), "Book not found")
+}
 
 // FindById implements gateway.BookGateway
 func (*BookInMemoryGateway) FindById(id string) (*domain.Book, error) {
@@ -21,14 +50,6 @@ func (*BookInMemoryGateway) FindById(id string) (*domain.Book, error) {
 	}
 	return nil, application.NewBookNotFoundError(errors.New("book not found"), "Book not found")
 }
-
-func initialBooks() []*domain.Book {
-	books := make([]*domain.Book, 1)
-	books[0], _ = domain.NewBook(1, "Title", "9783161484100", []string{"Author"}, []string{"Category"}, "en", "http://example.com/cover.jpg")
-	return books
-}
-
-var books = initialBooks()
 
 // FindAllByTitle implements gateway.BookGateway
 func (*BookInMemoryGateway) FindAllByTitle(title string) ([]*domain.Book, error) {

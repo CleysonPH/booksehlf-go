@@ -15,6 +15,8 @@ func NewRouter() http.Handler {
 		Methods(http.MethodGet)
 	router.HandleFunc("/api/v1/books/{bookId}", adapter.MuxAdapt(factory.GetBookWebController())).
 		Methods(http.MethodGet)
+	router.HandleFunc("/api/v1/books/{bookId}", adapter.MuxAdapt(factory.DeleteBookWebController())).
+		Methods(http.MethodDelete)
 
 	return router
 }

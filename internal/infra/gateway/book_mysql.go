@@ -31,6 +31,40 @@ type BookMySQLGateway struct {
 	db *sql.DB
 }
 
+const existsByIdQuery = `
+SELECT
+	id
+FROM
+	books
+WHERE
+	id = ?
+`
+
+// ExistsById implements gateway.BookGateway
+func (*BookMySQLGateway) ExistsById(id string) bool {
+	row := db.QueryRow(existsByIdQuery, id)
+	var f int64
+	if err := row.Scan(&f); err != nil {
+		return false
+	}
+	return true
+}
+
+const deleteByIdQuery = `
+DELETE FROM
+	books
+WHERE
+	id = ?
+`
+
+// DeleteById implements gateway.BookGateway
+func (*BookMySQLGateway) DeleteById(id string) error {
+	if _, err := db.Exec(deleteByIdQuery, id); err != nil {
+		return application.NewApplicationError(err, "error deleting book")
+	}
+	return nil
+}
+
 const findByIdQuery = `
 SELECT
 	id,
@@ -74,6 +108,9 @@ func (*BookMySQLGateway) FindById(id string) (*domain.Book, error) {
 		&f.CreatedAt,
 		&f.UpdatedAt,
 	); err != nil {
+		if err == sql.ErrNoRows {
+			return nil, application.NewBookNotFoundError(err, "Book not found")
+		}
 		return nil, application.NewApplicationError(err, "error scanning database row")
 	}
 	book, err := domain.NewBookWithAllValues(
@@ -93,10 +130,7 @@ func (*BookMySQLGateway) FindById(id string) (*domain.Book, error) {
 		f.UpdatedAt,
 	)
 	if err != nil {
-		if err == sql.ErrNoRows {
-			return nil, application.NewBookNotFoundError(err, "Book not found")
-		}
-		return nil, application.NewApplicationError(err, "error creating book")
+		return nil, application.NewApplicationError(err, "error creating book: "+err.Error())
 	}
 	return book, nil
 }

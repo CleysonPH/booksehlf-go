@@ -24,10 +24,18 @@ func GetBookUseCase() *usecase.GetBookUseCase {
 	return usecase.NewGetBookUseCase(BookGateway())
 }
 
+func DeleteBookUseCase() *usecase.DeleteBookUseCase {
+	return usecase.NewDeleteBookUseCase(BookGateway())
+}
+
 func GetBooksWebController() controller.WebController {
 	return controller.NewGetBooksWebController(GetBooksUseCase())
 }
 
 func GetBookWebController() controller.WebController {
 	return controller.NewGetBookWebController(GetBookUseCase())
+}
+
+func DeleteBookWebController() controller.WebController {
+	return controller.NewDeleteBookWebController(DeleteBookUseCase())
 }
