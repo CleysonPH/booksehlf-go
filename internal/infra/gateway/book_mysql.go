@@ -74,6 +74,9 @@ func (*BookMySQLGateway) FindById(id string) (*domain.Book, error) {
 		&f.CreatedAt,
 		&f.UpdatedAt,
 	); err != nil {
+		if err == sql.ErrNoRows {
+			return nil, application.NewBookNotFoundError(err, "Book not found")
+		}
 		return nil, application.NewApplicationError(err, "error scanning database row")
 	}
 	book, err := domain.NewBookWithAllValues(
@@ -93,10 +96,7 @@ func (*BookMySQLGateway) FindById(id string) (*domain.Book, error) {
 		f.UpdatedAt,
 	)
 	if err != nil {
-		if err == sql.ErrNoRows {
-			return nil, application.NewBookNotFoundError(err, "Book not found")
-		}
-		return nil, application.NewApplicationError(err, "error creating book")
+		return nil, application.NewApplicationError(err, "error creating book: "+err.Error())
 	}
 	return book, nil
 }

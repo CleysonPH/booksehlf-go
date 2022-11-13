@@ -69,6 +69,34 @@ paths:
                 status: 404
                 error: Not Found
                 cause: BookNotFoundError
+    delete:
+      tags:
+        - Books
+      summary: Delete book by id
+      description: Delete book by id
+      operationId: deleteBookById
+      parameters:
+        - name: bookId
+          in: path
+          description: Book id
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: No content
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                message: Book not found
+                timestamp: 2020-01-01T00:00:00.000Z
+                status: 404
+                error: Not Found
+                cause: BookNotFoundError
 components:
   schemas:
     BookSummaryResponse:
