@@ -20,6 +20,16 @@ var books = initialBooks()
 
 type BookInMemoryGateway struct{}
 
+// ExistsById implements gateway.BookGateway
+func (*BookInMemoryGateway) ExistsById(id string) bool {
+	for _, book := range books {
+		if fmt.Sprintf("%d", book.ID()) == id {
+			return true
+		}
+	}
+	return false
+}
+
 // DeleteById implements gateway.BookGateway
 func (*BookInMemoryGateway) DeleteById(id string) error {
 	for i, book := range books {

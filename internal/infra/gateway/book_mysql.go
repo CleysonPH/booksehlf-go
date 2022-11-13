@@ -31,6 +31,25 @@ type BookMySQLGateway struct {
 	db *sql.DB
 }
 
+const existsByIdQuery = `
+SELECT
+	id
+FROM
+	books
+WHERE
+	id = ?
+`
+
+// ExistsById implements gateway.BookGateway
+func (*BookMySQLGateway) ExistsById(id string) bool {
+	row := db.QueryRow(existsByIdQuery, id)
+	var f int64
+	if err := row.Scan(&f); err != nil {
+		return false
+	}
+	return true
+}
+
 const deleteByIdQuery = `
 DELETE FROM
 	books
