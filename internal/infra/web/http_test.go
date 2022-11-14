@@ -24,7 +24,8 @@ func TestNewHttpRequest_ShouldReturnHttpRequest(t *testing.T) {
 	expectedURLParams := map[string]string{
 		"key": "value",
 	}
-	request := NewHttpRequest(expectedQueryParams, expectedURLParams)
+	request := NewHttpRequest(expectedQueryParams, expectedURLParams, []byte("body"))
 	assert.Equal(t, expectedQueryParams, request.QueryParams)
 	assert.Equal(t, expectedURLParams, request.URLParams)
+	assert.Equal(t, []byte("body"), request.Body)
 }

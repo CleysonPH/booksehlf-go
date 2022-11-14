@@ -55,7 +55,7 @@ func TestGetBooksWebController_Execute(t *testing.T) {
 	expectedBook, _ := domain.NewBook(1, "Title", "9783161484100", []string{"Author"}, []string{"Category"}, "en", "http://example.com/cover.jpg")
 	gateway.On("FindAllByTitle", "Title").Return([]*domain.Book{expectedBook}, nil)
 
-	resp := controller.Execute(web.NewHttpRequest(url.Values{"q": []string{"Title"}}, map[string]string{}))
+	resp := controller.Execute(web.NewHttpRequest(url.Values{"q": []string{"Title"}}, map[string]string{}, nil))
 	assert.Equal(t, 200, resp.StatusCode)
 	assert.Equal(t, "application/json", resp.Headers.ContentType)
 	assert.True(t, strings.Contains(string(resp.Body), `"title":"Title"`))
@@ -69,7 +69,7 @@ func TestGetBooksWebController_ExecuteWithError(t *testing.T) {
 
 	gateway.On("FindAllByTitle", "Title").Return([]*domain.Book{}, application.NewApplicationError(errors.New("error"), "Error"))
 
-	resp := controller.Execute(web.NewHttpRequest(url.Values{"q": []string{"Title"}}, map[string]string{}))
+	resp := controller.Execute(web.NewHttpRequest(url.Values{"q": []string{"Title"}}, map[string]string{}, nil))
 	assert.Equal(t, 500, resp.StatusCode)
 	assert.Equal(t, "application/json", resp.Headers.ContentType)
 	assert.True(t, strings.Contains(string(resp.Body), `"error":"Internal Server Error"`))
