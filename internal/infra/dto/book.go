@@ -1,6 +1,7 @@
 package dto
 
 import (
+	"encoding/json"
 	"time"
 
 	"github.com/cleysonph/bookshelf-go/internal/domain"
@@ -64,4 +65,41 @@ func (b *BookResponse) FromDomain(book *domain.Book) {
 	b.Edition = NullInt32{Value: book.Edition()}
 	b.CreatedAt = book.CreatedAt()
 	b.UpdatedAt = book.UpdatedAt()
+}
+
+type CreateBookRequest struct {
+	Title       string     `json:"title"`
+	Isbn        string     `json:"isbn"`
+	Authors     []string   `json:"authors"`
+	Categories  []string   `json:"categories"`
+	Language    string     `json:"language"`
+	Description NullString `json:"description"`
+	PublishedAt NullTime   `json:"published_at"`
+	Publisher   NullString `json:"publisher"`
+	Pages       NullInt32  `json:"pages"`
+	Edition     NullInt32  `json:"edition"`
+}
+
+func (b *CreateBookRequest) FromJson(jsonBody []byte) error {
+	return json.Unmarshal(jsonBody, b)
+}
+
+func (b *CreateBookRequest) ToDomain() *domain.Book {
+	book, _ := domain.NewBookWithAllValues(
+		0,
+		b.Title,
+		b.Isbn,
+		b.Authors,
+		b.Categories,
+		b.Language,
+		"",
+		b.Description.Value,
+		b.PublishedAt.Value,
+		b.Publisher.Value,
+		b.Pages.Value,
+		b.Edition.Value,
+		time.Time{},
+		time.Time{},
+	)
+	return book
 }

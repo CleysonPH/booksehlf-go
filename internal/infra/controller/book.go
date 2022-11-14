@@ -69,3 +69,28 @@ func (d *DeleteBookWebController) Execute(request *web.HttpRequest) *web.HttpRes
 func NewDeleteBookWebController(deleteBookUseCase *usecase.DeleteBookUseCase) WebController {
 	return &DeleteBookWebController{deleteBookUseCase: deleteBookUseCase}
 }
+
+func NewCreateBookWebController(createBookUseCase *usecase.CreateBookUseCase) WebController {
+	return &CreateBookWebController{createBookUseCase: createBookUseCase}
+}
+
+type CreateBookWebController struct {
+	createBookUseCase *usecase.CreateBookUseCase
+}
+
+// Execute implements WebController
+func (c *CreateBookWebController) Execute(request *web.HttpRequest) *web.HttpResponse {
+	var body dto.CreateBookRequest
+	err := body.FromJson(request.Body)
+	if err != nil {
+		return handleErrorResponse(err)
+	}
+	book := body.ToDomain()
+	book, err = c.createBookUseCase.Execute(book)
+	if err != nil {
+		return handleErrorResponse(err)
+	}
+	response := dto.BookResponse{}
+	response.FromDomain(book)
+	return newJsonResponse(http.StatusCreated, response)
+}
