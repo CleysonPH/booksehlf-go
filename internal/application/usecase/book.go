@@ -5,6 +5,7 @@ import (
 
 	"github.com/cleysonph/bookshelf-go/internal/application"
 	"github.com/cleysonph/bookshelf-go/internal/application/gateway"
+	"github.com/cleysonph/bookshelf-go/internal/application/validator"
 	"github.com/cleysonph/bookshelf-go/internal/domain"
 )
 
@@ -45,4 +46,23 @@ func (u *DeleteBookUseCase) Execute(id string) error {
 		return application.NewBookNotFoundError(errors.New("book not found"), "Book not found")
 	}
 	return u.bookGateway.DeleteById(id)
+}
+
+func NewCreateBookUseCase(
+	bookGateway gateway.BookGateway,
+	createBookValidator validator.CreateBookValidator,
+) *CreateBookUseCase {
+	return &CreateBookUseCase{bookGateway, createBookValidator}
+}
+
+type CreateBookUseCase struct {
+	bookGateway         gateway.BookGateway
+	createBookValidator validator.CreateBookValidator
+}
+
+func (u *CreateBookUseCase) Execute(createBook *domain.Book) (*domain.Book, error) {
+	if err := u.createBookValidator.Validate(createBook); err != nil {
+		return nil, err
+	}
+	return u.bookGateway.Create(createBook)
 }
