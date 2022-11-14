@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"time"
 
+	"github.com/cleysonph/bookshelf-go/internal/application"
 	"github.com/cleysonph/bookshelf-go/internal/domain"
 )
 
@@ -39,7 +40,7 @@ type BookResponse struct {
 	Language    string     `json:"language"`
 	Cover       NullString `json:"cover"`
 	Description NullString `json:"description"`
-	PublishedAt NullTime   `json:"published_at"`
+	PublishedAt NullString `json:"published_at"`
 	Publisher   NullString `json:"publisher"`
 	Pages       NullInt32  `json:"pages"`
 	Edition     NullInt32  `json:"edition"`
@@ -59,7 +60,7 @@ func (b *BookResponse) FromDomain(book *domain.Book) {
 	b.Language = book.Language()
 	b.Cover = NullString{Value: book.Cover()}
 	b.Description = NullString{Value: book.Description()}
-	b.PublishedAt = NullTime{Value: book.PublishedAt()}
+	b.PublishedAt = NullString{Value: book.PublishedAt().Format("2006-01-02")}
 	b.Publisher = NullString{Value: book.Publisher()}
 	b.Pages = NullInt32{Value: book.Pages()}
 	b.Edition = NullInt32{Value: book.Edition()}
@@ -74,7 +75,7 @@ type CreateBookRequest struct {
 	Categories  []string   `json:"categories"`
 	Language    string     `json:"language"`
 	Description NullString `json:"description"`
-	PublishedAt NullTime   `json:"published_at"`
+	PublishedAt NullString `json:"published_at"`
 	Publisher   NullString `json:"publisher"`
 	Pages       NullInt32  `json:"pages"`
 	Edition     NullInt32  `json:"edition"`
@@ -84,8 +85,9 @@ func (b *CreateBookRequest) FromJson(jsonBody []byte) error {
 	return json.Unmarshal(jsonBody, b)
 }
 
-func (b *CreateBookRequest) ToDomain() *domain.Book {
-	book, _ := domain.NewBookWithAllValues(
+func (b *CreateBookRequest) ToDomain() (*domain.Book, error) {
+	publishedAt, _ := time.Parse("2006-01-02", b.PublishedAt.Value)
+	book, err := domain.NewBookWithAllValues(
 		0,
 		b.Title,
 		b.Isbn,
@@ -94,12 +96,15 @@ func (b *CreateBookRequest) ToDomain() *domain.Book {
 		b.Language,
 		"",
 		b.Description.Value,
-		b.PublishedAt.Value,
+		publishedAt,
 		b.Publisher.Value,
 		b.Pages.Value,
 		b.Edition.Value,
 		time.Time{},
 		time.Time{},
 	)
-	return book
+	if err != nil {
+		return nil, application.NewApplicationError(err, "error creating book: "+err.Error())
+	}
+	return book, nil
 }

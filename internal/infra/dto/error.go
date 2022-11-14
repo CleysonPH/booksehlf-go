@@ -21,7 +21,7 @@ func NewErrorResponse(err error, satusCode int) *ErrorResponse {
 	}
 	return &ErrorResponse{
 		Message:   err.Error(),
-		Timestamp: time.Now(),
+		Timestamp: time.Now().UTC(),
 		Status:    satusCode,
 		Error:     http.StatusText(satusCode),
 		Cause:     strings.Split(reflect.TypeOf(err).String(), ".")[1],
@@ -43,7 +43,7 @@ func NewValidationErrorResponse(err error, satusCode int, errors map[string][]st
 	}
 	return &ValidationErrorResponse{
 		Message:   err.Error(),
-		Timestamp: time.Now(),
+		Timestamp: time.Now().UTC(),
 		Status:    satusCode,
 		Error:     http.StatusText(satusCode),
 		Cause:     strings.Split(reflect.TypeOf(err).String(), ".")[1],

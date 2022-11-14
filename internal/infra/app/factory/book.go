@@ -5,6 +5,7 @@ import (
 	"github.com/cleysonph/bookshelf-go/internal/application/usecase"
 	"github.com/cleysonph/bookshelf-go/internal/application/validator"
 	"github.com/cleysonph/bookshelf-go/internal/infra/controller"
+	"github.com/cleysonph/bookshelf-go/internal/infra/dto"
 	gatewayImpl "github.com/cleysonph/bookshelf-go/internal/infra/gateway"
 	validatorImpl "github.com/cleysonph/bookshelf-go/internal/infra/validator"
 )
@@ -18,7 +19,7 @@ func BookGateway() gateway.BookGateway {
 	return bookGateway
 }
 
-func CreateBookValidator() validator.CreateBookValidator {
+func CreateBookValidator() validator.Validator[*dto.CreateBookRequest] {
 	return validatorImpl.NewCreateBookValidator()
 }
 
@@ -35,7 +36,7 @@ func DeleteBookUseCase() *usecase.DeleteBookUseCase {
 }
 
 func CreateBookUseCase() *usecase.CreateBookUseCase {
-	return usecase.NewCreateBookUseCase(BookGateway(), CreateBookValidator())
+	return usecase.NewCreateBookUseCase(BookGateway())
 }
 
 func GetBooksWebController() controller.WebController {
@@ -51,5 +52,5 @@ func DeleteBookWebController() controller.WebController {
 }
 
 func CreateBookWebController() controller.WebController {
-	return controller.NewCreateBookWebController(CreateBookUseCase())
+	return controller.NewCreateBookWebController(CreateBookUseCase(), CreateBookValidator())
 }
