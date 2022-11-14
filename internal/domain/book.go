@@ -1,7 +1,6 @@
 package domain
 
 import (
-	"errors"
 	"time"
 )
 
@@ -142,37 +141,37 @@ func (b Book) UpdatedAt() time.Time {
 
 func (b Book) validate() error {
 	if b.title == "" {
-		return errors.New("title is required")
+		return NewDomainError("title is required")
 	}
 
 	if b.isbn == "" {
-		return errors.New("isbn is required")
+		return NewDomainError("isbn is required")
 	}
 
 	if len(b.isbn) != 13 {
-		return errors.New("isbn must be 13 digits")
+		return NewDomainError("isbn must be 13 digits")
 	}
 
 	for _, c := range b.isbn {
 		if c < '0' || c > '9' {
-			return errors.New("isbn must contain only numbers")
+			return NewDomainError("isbn must contain only numbers")
 		}
 	}
 
 	if len(b.authors) == 0 {
-		return errors.New("authors are required")
+		return NewDomainError("authors are required")
 	}
 
 	if len(b.categories) == 0 {
-		return errors.New("categories are required")
+		return NewDomainError("categories are required")
 	}
 
 	if b.language == "" {
-		return errors.New("language is required")
+		return NewDomainError("language is required")
 	}
 
 	if len(b.language) != 2 {
-		return errors.New("language must be 2 characters")
+		return NewDomainError("language must be 2 characters")
 	}
 
 	return nil

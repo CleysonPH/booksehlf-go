@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/cleysonph/bookshelf-go/internal/application/usecase"
+	"github.com/cleysonph/bookshelf-go/internal/application/validator"
 	"github.com/cleysonph/bookshelf-go/internal/infra/dto"
 	"github.com/cleysonph/bookshelf-go/internal/infra/web"
 )
@@ -68,4 +69,41 @@ func (d *DeleteBookWebController) Execute(request *web.HttpRequest) *web.HttpRes
 
 func NewDeleteBookWebController(deleteBookUseCase *usecase.DeleteBookUseCase) WebController {
 	return &DeleteBookWebController{deleteBookUseCase: deleteBookUseCase}
+}
+
+func NewCreateBookWebController(
+	createBookUseCase *usecase.CreateBookUseCase,
+	createBookValidator validator.Validator[*dto.CreateBookRequest],
+) WebController {
+	return &CreateBookWebController{
+		createBookUseCase:   createBookUseCase,
+		createBookValidator: createBookValidator,
+	}
+}
+
+type CreateBookWebController struct {
+	createBookUseCase   *usecase.CreateBookUseCase
+	createBookValidator validator.Validator[*dto.CreateBookRequest]
+}
+
+// Execute implements WebController
+func (c *CreateBookWebController) Execute(request *web.HttpRequest) *web.HttpResponse {
+	var body dto.CreateBookRequest
+	if err := body.FromJson(request.Body); err != nil {
+		return handleErrorResponse(err)
+	}
+	if err := c.createBookValidator.Validate(&body); err != nil {
+		return handleErrorResponse(err)
+	}
+	book, err := body.ToDomain()
+	if err != nil {
+		return handleErrorResponse(err)
+	}
+	book, err = c.createBookUseCase.Execute(book)
+	if err != nil {
+		return handleErrorResponse(err)
+	}
+	response := dto.BookResponse{}
+	response.FromDomain(book)
+	return newJsonResponse(http.StatusCreated, response)
 }

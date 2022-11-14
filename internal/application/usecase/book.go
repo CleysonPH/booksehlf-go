@@ -46,3 +46,15 @@ func (u *DeleteBookUseCase) Execute(id string) error {
 	}
 	return u.bookGateway.DeleteById(id)
 }
+
+func NewCreateBookUseCase(bookGateway gateway.BookGateway) *CreateBookUseCase {
+	return &CreateBookUseCase{bookGateway}
+}
+
+type CreateBookUseCase struct {
+	bookGateway gateway.BookGateway
+}
+
+func (u *CreateBookUseCase) Execute(createBook *domain.Book) (*domain.Book, error) {
+	return u.bookGateway.Create(createBook)
+}

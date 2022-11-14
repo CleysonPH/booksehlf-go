@@ -20,6 +20,12 @@ var books = initialBooks()
 
 type BookInMemoryGateway struct{}
 
+// Create implements gateway.BookGateway
+func (*BookInMemoryGateway) Create(book *domain.Book) (*domain.Book, error) {
+	books = append(books, book)
+	return book, nil
+}
+
 // ExistsById implements gateway.BookGateway
 func (*BookInMemoryGateway) ExistsById(id string) bool {
 	for _, book := range books {

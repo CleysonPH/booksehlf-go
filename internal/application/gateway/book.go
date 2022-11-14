@@ -7,4 +7,5 @@ type BookGateway interface {
 	FindById(id string) (*domain.Book, error)
 	DeleteById(id string) error
 	ExistsById(id string) bool
+	Create(book *domain.Book) (*domain.Book, error)
 }

@@ -5,6 +5,8 @@ import (
 	"net/http"
 
 	"github.com/cleysonph/bookshelf-go/internal/application"
+	"github.com/cleysonph/bookshelf-go/internal/application/validator"
+	"github.com/cleysonph/bookshelf-go/internal/domain"
 	"github.com/cleysonph/bookshelf-go/internal/infra/dto"
 	"github.com/cleysonph/bookshelf-go/internal/infra/web"
 )
@@ -32,6 +34,15 @@ func handleErrorResponse(err error) *web.HttpResponse {
 		return newJsonResponse(e.Status, e)
 	case *application.ApplicationError:
 		e := dto.NewErrorResponse(t, http.StatusInternalServerError)
+		return newJsonResponse(e.Status, e)
+	case *validator.ValidationError:
+		e := dto.NewValidationErrorResponse(t, http.StatusBadRequest, t.Errors)
+		return newJsonResponse(e.Status, e)
+	case *json.SyntaxError:
+		e := dto.NewErrorResponse(t, http.StatusBadRequest)
+		return newJsonResponse(e.Status, e)
+	case *domain.DomainError:
+		e := dto.NewErrorResponse(t, http.StatusBadRequest)
 		return newJsonResponse(e.Status, e)
 	default:
 		e := dto.NewErrorResponse(err, http.StatusInternalServerError)

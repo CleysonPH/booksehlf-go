@@ -2,6 +2,7 @@ package gateway
 
 import (
 	"database/sql"
+	"fmt"
 	"strings"
 	"time"
 
@@ -27,8 +28,92 @@ type bookTable struct {
 	UpdatedAt   time.Time
 }
 
+func (b *bookTable) FromBook(book *domain.Book) {
+	b.ID = book.ID()
+	b.Title = book.Title()
+	b.Isbn = book.ISBN()
+	b.Authors = strings.Join(book.Authors(), ",")
+	b.Categories = strings.Join(book.Categories(), ",")
+	b.Language = book.Language()
+	b.Cover = sql.NullString{String: book.Cover(), Valid: book.Cover() != ""}
+	b.Description = sql.NullString{String: book.Description(), Valid: book.Description() != ""}
+	b.PublishedAt = sql.NullTime{Time: book.PublishedAt(), Valid: !book.PublishedAt().IsZero()}
+	b.Publisher = sql.NullString{String: book.Publisher(), Valid: book.Publisher() != ""}
+	b.Pages = sql.NullInt32{Int32: book.Pages(), Valid: book.Pages() != 0}
+	b.Edition = sql.NullInt32{Int32: book.Edition(), Valid: book.Edition() != 0}
+	b.CreatedAt = book.CreatedAt()
+	b.UpdatedAt = book.UpdatedAt()
+}
+
+func (b *bookTable) ToBook() (*domain.Book, error) {
+	book, err := domain.NewBookWithAllValues(
+		b.ID,
+		b.Title,
+		b.Isbn,
+		strings.Split(b.Authors, ","),
+		strings.Split(b.Categories, ","),
+		b.Language,
+		b.Cover.String,
+		b.Description.String,
+		b.PublishedAt.Time,
+		b.Publisher.String,
+		b.Pages.Int32,
+		b.Edition.Int32,
+		b.CreatedAt,
+		b.UpdatedAt,
+	)
+	if err != nil {
+		return nil, application.NewApplicationError(err, "error creating book: "+err.Error())
+	}
+	return book, nil
+}
+
 type BookMySQLGateway struct {
 	db *sql.DB
+}
+
+const createQuery = `
+INSERT INTO books (
+	title,
+	isbn,
+	authors,
+	categories,
+	language,
+	cover,
+	description,
+	published_at,
+	publisher,
+	pages,
+	edition
+) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+`
+
+// Create implements gateway.BookGateway
+func (b *BookMySQLGateway) Create(book *domain.Book) (*domain.Book, error) {
+	var f bookTable
+	f.FromBook(book)
+	result, err := db.Exec(
+		createQuery,
+		f.Title,
+		f.Isbn,
+		f.Authors,
+		f.Categories,
+		f.Language,
+		f.Cover,
+		f.Description,
+		f.PublishedAt,
+		f.Publisher,
+		f.Pages,
+		f.Edition,
+	)
+	if err != nil {
+		return nil, application.NewApplicationError(err, "error creating book")
+	}
+	id, err := result.LastInsertId()
+	if err != nil {
+		return nil, application.NewApplicationError(err, "error getting last insert id")
+	}
+	return b.FindById(fmt.Sprintf("%d", id))
 }
 
 const existsByIdQuery = `
@@ -113,26 +198,7 @@ func (*BookMySQLGateway) FindById(id string) (*domain.Book, error) {
 		}
 		return nil, application.NewApplicationError(err, "error scanning database row")
 	}
-	book, err := domain.NewBookWithAllValues(
-		f.ID,
-		f.Title,
-		f.Isbn,
-		strings.Split(f.Authors, ","),
-		strings.Split(f.Categories, ","),
-		f.Language,
-		f.Cover.String,
-		f.Description.String,
-		f.PublishedAt.Time,
-		f.Publisher.String,
-		f.Pages.Int32,
-		f.Edition.Int32,
-		f.CreatedAt,
-		f.UpdatedAt,
-	)
-	if err != nil {
-		return nil, application.NewApplicationError(err, "error creating book: "+err.Error())
-	}
-	return book, nil
+	return f.ToBook()
 }
 
 const findAllByTitleQuery = `
@@ -172,17 +238,9 @@ func (*BookMySQLGateway) FindAllByTitle(title string) ([]*domain.Book, error) {
 		); err != nil {
 			return nil, application.NewApplicationError(err, "error scanning database row")
 		}
-		book, err := domain.NewBook(
-			f.ID,
-			f.Title,
-			f.Isbn,
-			strings.Split(f.Authors, ","),
-			strings.Split(f.Categories, ","),
-			f.Language,
-			f.Cover.String,
-		)
+		book, err := f.ToBook()
 		if err != nil {
-			return nil, application.NewApplicationError(err, "error creating book")
+			return nil, err
 		}
 		result = append(result, book)
 	}
